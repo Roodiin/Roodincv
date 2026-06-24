@@ -1,0 +1,860 @@
+/* ============================================================
+   PORTFOLIO STYLESHEET
+   ------------------------------------------------------------
+   Table of contents:
+     1. Design tokens (CSS variables) — edit colors/fonts here
+     2. Reset & base
+     3. Layout helpers
+     4. Header & navigation
+     5. Margin index (signature element)
+     6. Hero
+     7. About
+     8. Work / projects
+     9. Skills
+    10. Services
+    11. Contact & form
+    12. Footer & back-to-top
+    13. Media queries (mobile-first: base styles = mobile,
+        then min-width breakpoints layer on larger-screen rules)
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   1. DESIGN TOKENS
+   Change these values to re-theme the entire site. Everything
+   below references these variables rather than hard-coded colors.
+---------------------------------------------------------- */
+:root {
+  /* Palette */
+  --color-paper:       #FAF8F3; /* page background */
+  --color-paper-dim:   #F1EDE3; /* secondary surface */
+  --color-ink:         #1C1B19; /* primary text / dark surfaces */
+  --color-ink-soft:    #4A4845; /* secondary text */
+  --color-accent:      #C4501F; /* burnt sienna — links, CTAs, marks */
+  --color-accent-dim:  #E8C7B5; /* tint of accent for backgrounds */
+  --color-sage:        #5B6B5C; /* secondary accent — tags/meta */
+  --color-rule:        #D8D2C4; /* hairline borders/dividers */
+
+  /* Type */
+  --font-display: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Courier New', Courier, monospace;
+
+  /* Type scale (mobile base; scaled up via media queries) */
+  --fs-h1: 2.25rem;
+  --fs-h2: 1.75rem;
+  --fs-h3: 1.15rem;
+  --fs-body: 1rem;
+  --fs-small: 0.85rem;
+
+  /* Spacing scale */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.75rem;
+  --space-lg: 3rem;
+  --space-xl: 5rem;
+
+  /* Layout */
+  --content-max: 1180px;
+  --radius: 3px; /* kept small/sharp on purpose — notebook aesthetic, not soft UI */
+  --margin-index-width: 84px;
+
+  /* Motion */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+}
+
+/* ----------------------------------------------------------
+   2. RESET & BASE
+---------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+
+h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.15; }
+
+p { margin: 0 0 var(--space-sm); }
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+ul { margin: 0; padding: 0; list-style: none; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* Visible keyboard focus everywhere — accessibility floor */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Skip link: visually hidden until focused */
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding: var(--space-xs) var(--space-sm);
+  z-index: 1000;
+}
+.skip-link:focus { left: var(--space-sm); top: var(--space-sm); }
+
+/* ----------------------------------------------------------
+   3. LAYOUT HELPERS
+---------------------------------------------------------- */
+.section { padding: var(--space-xl) 0; border-bottom: 1px solid var(--color-rule); }
+.section:last-of-type { border-bottom: none; }
+
+.section-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-sage);
+  margin: 0 0 var(--space-sm);
+}
+
+.section-title {
+  font-size: var(--fs-h2);
+  margin-bottom: var(--space-md);
+  max-width: 38ch;
+}
+
+/* Underline-annotation treatment for emphasized phrases */
+.annotate {
+  position: relative;
+  white-space: nowrap;
+}
+.annotate::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: 2px;
+  height: 0.4em;
+  background: var(--color-accent-dim);
+  z-index: -1;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  border: 1.5px solid var(--color-ink);
+  border-radius: var(--radius);
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+.btn:hover { text-decoration: none; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn--primary {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+.btn--primary:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-ink);
+}
+.btn--ghost:hover { background: var(--color-ink); color: var(--color-paper); }
+
+.btn--block { width: 100%; text-align: center; }
+
+/* ----------------------------------------------------------
+   4. HEADER & NAVIGATION (mobile-first)
+---------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.header-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--color-ink);
+}
+.logo:hover { text-decoration: none; }
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border-radius: 50%;
+  font-size: 1rem;
+}
+
+/* Hamburger button — visible by default (mobile-first), hidden at desktop breakpoint */
+.nav-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 38px;
+  height: 38px;
+  padding: 6px;
+}
+.nav-toggle-bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--color-ink);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+/* Animated "X" state when menu is open */
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile nav: full-width panel that drops below header, hidden until toggled */
+.primary-nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-rule);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-base);
+}
+.primary-nav.is-open { max-height: 320px; }
+
+.primary-nav ul {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+}
+
+.nav-link {
+  display: block;
+  padding: var(--space-sm) 0;
+  color: var(--color-ink);
+  font-size: 1.05rem;
+  border-bottom: 1px solid var(--color-rule);
+}
+.primary-nav li:last-child .nav-link { border-bottom: none; }
+.nav-link:hover { color: var(--color-accent); text-decoration: none; }
+
+.nav-link--cta {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* ----------------------------------------------------------
+   5. MARGIN INDEX (signature element)
+   Hidden on mobile/tablet — appears as a fixed tab-strip at the
+   desktop breakpoint (see media query section). Keep aria-hidden
+   in HTML since it duplicates the primary nav for sighted users only.
+---------------------------------------------------------- */
+.margin-index { display: none; }
+
+/* ----------------------------------------------------------
+   6. HERO
+---------------------------------------------------------- */
+.hero { padding-top: var(--space-lg); }
+
+.hero-grid {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-sage);
+  margin-bottom: var(--space-sm);
+}
+
+.hero-title {
+  font-size: var(--fs-h1);
+  margin-bottom: var(--space-md);
+}
+
+.hero-lede {
+  font-size: 1.05rem;
+  color: var(--color-ink-soft);
+  max-width: 42ch;
+  margin-bottom: var(--space-md);
+}
+
+.hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+
+.hero-marginalia {
+  background: var(--color-paper-dim);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+}
+
+.marginalia-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  border-bottom: 1px dashed var(--color-rule);
+  font-size: 0.92rem;
+}
+.marginalia-row:last-child { border-bottom: none; }
+.marginalia-row dt { color: var(--color-ink-soft); font-family: var(--font-mono); font-size: 0.8rem; }
+.marginalia-row dd { margin: 0; text-align: right; font-weight: 600; }
+
+/* ----------------------------------------------------------
+   7. ABOUT
+---------------------------------------------------------- */
+.about-grid { display: grid; gap: var(--space-lg); }
+
+.about-grid {
+  max-width: 900px;
+  margin: 0 auto;
+  justify-items: stretch;
+}
+
+.about-photo {
+  aspect-ratio: 1/1;
+  background:
+    linear-gradient(180deg, rgba(250,248,243,0.96), rgba(241,237,227,0.9)),
+    radial-gradient(circle at top left, rgba(196,80,31,0.12), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(91,107,92,0.16), transparent 30%);
+  border: 1px solid var(--color-rule);
+  border-radius: calc(var(--radius) * 2);
+  box-shadow: 0 20px 45px rgba(28,27,25,0.07);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: 0.75rem;
+  justify-self: center;
+}
+
+.about-copy {
+  width: 100%;
+}
+
+.about-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+}
+/* To use a real photo, replace this div in HTML with:
+   <img src="your-photo.jpg" alt="Portrait of ..." class="about-photo"> */
+
+.about-copy p { color: var(--color-ink-soft); max-width: 56ch; }
+
+.credentials { margin-top: var(--space-md); }
+.credentials li {
+  display: grid;
+  grid-template-columns: auto;
+  justify-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  border-top: 1px solid var(--color-rule);
+  font-size: 0.92rem;
+  text-align: center;
+}
+.credentials-year {
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  width: auto;
+}
+
+/* ----------------------------------------------------------
+   8. WORK / PROJECTS
+---------------------------------------------------------- */
+.work-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.filter-btn {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+.filter-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.filter-btn.is-active {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+/* Each project card: easy to copy/paste as a unit (see HTML comments) */
+.project-card {
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-paper);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+.project-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px -12px rgba(28, 27, 25, 0.25);
+}
+
+.project-thumb {
+  aspect-ratio: 16 / 10;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-sm);
+  overflow: hidden; /* ensure image is clipped to same size for all cards */
+}
+
+/* support images placed inside the .project-thumb or a standalone .project-thumb-img */
+.project-thumb img,
+.project-thumb-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* fill the thumbnail area consistently */
+  display: block;
+}
+
+/* show tag over the image (overlay) */
+.project-thumb-tag {
+  position: absolute;
+  left: var(--space-sm);
+  bottom: var(--space-sm);
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(0,0,0,0.48); /* semi-opaque for contrast on images */
+  color: #fff;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius);
+  backdrop-filter: blur(4px); /* subtle legibility boost on supported browsers */
+}
+
+.project-body { padding: var(--space-md); }
+
+.project-title { font-size: var(--fs-h3); margin-bottom: var(--space-xs); }
+
+.project-blurb { color: var(--color-ink-soft); font-size: 0.92rem; margin-bottom: var(--space-sm); }
+
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: var(--space-sm);
+}
+.project-meta li {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-sage);
+  border: 1px solid var(--color-rule);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius);
+}
+
+.project-link { font-weight: 600; font-size: 0.92rem; }
+
+.work-empty {
+  text-align: center;
+  color: var(--color-ink-soft);
+  padding: var(--space-lg) 0;
+}
+
+/* ----------------------------------------------------------
+   9. SKILLS
+---------------------------------------------------------- */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+.skill-group-title {
+  font-size: 1.05rem;
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-xs);
+  border-bottom: 2px solid var(--color-ink);
+  display: inline-block;
+}
+
+.skill-list li { margin-bottom: var(--space-sm); }
+
+.skill-list span {
+  display: block;
+  font-size: 0.92rem;
+  margin-bottom: 0.3rem;
+}
+
+/* Proficiency bar driven by the --level custom property set inline in HTML */
+.skill-list li {
+  position: relative;
+}
+.skill-list li::after {
+  content: '';
+  display: block;
+  height: 5px;
+  width: 100%;
+  background: var(--color-rule);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.skill-list li::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  width: var(--level, 50%);
+  background: var(--color-accent);
+  border-radius: 999px;
+  z-index: 1;
+}
+
+/* ----------------------------------------------------------
+   10. SERVICES
+---------------------------------------------------------- */
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+.service-card {
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  background: var(--color-paper);
+  transition: border-color var(--transition-base);
+}
+.service-card:hover { border-color: var(--color-accent); }
+
+.service-mark {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--color-accent-dim);
+  -webkit-text-stroke: 1px var(--color-accent);
+  margin-bottom: var(--space-sm);
+}
+
+.service-title { font-size: 1.1rem; margin-bottom: var(--space-xs); }
+
+.service-desc { color: var(--color-ink-soft); font-size: 0.92rem; margin: 0; }
+
+/* ----------------------------------------------------------
+   11. CONTACT & FORM
+---------------------------------------------------------- */
+.contact-grid { display: grid; gap: var(--space-lg); }
+
+.contact-lede { color: var(--color-ink-soft); max-width: 42ch; }
+
+.contact-direct { margin-top: var(--space-md); }
+.contact-direct li { margin-bottom: var(--space-xs); }
+.contact-direct a { font-weight: 600; }
+
+.contact-form { display: flex; flex-direction: column; gap: var(--space-md); }
+
+.form-row { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.form-row label { font-size: 0.85rem; font-weight: 600; color: var(--color-ink-soft); }
+
+.form-row input,
+.form-row textarea,
+.form-row select {
+  padding: 0.7rem 0.85rem;
+  border: 1.5px solid var(--color-rule);
+  border-radius: var(--radius);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  transition: border-color var(--transition-fast);
+}
+.form-row input:focus,
+.form-row textarea:focus,
+.form-row select:focus { border-color: var(--color-accent); }
+
+/* Invalid-state styling toggled by script.js via .has-error on .form-row */
+.form-row.has-error input,
+.form-row.has-error textarea { border-color: #B3261E; }
+
+.form-error {
+  font-size: 0.8rem;
+  color: #B3261E;
+  min-height: 1em;
+}
+
+.form-status {
+  font-size: 0.92rem;
+  font-weight: 600;
+  min-height: 1.2em;
+}
+.form-status.is-success { color: var(--color-sage); }
+.form-status.is-error { color: #B3261E; }
+
+/* ----------------------------------------------------------
+   12. FOOTER & BACK-TO-TOP
+---------------------------------------------------------- */
+.site-footer {
+  background: var(--color-ink);
+  color: var(--color-paper-dim);
+  padding: var(--space-lg) 0 var(--space-md);
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: center;
+}
+
+.footer-note { display: flex; align-items: center; gap: var(--space-xs); justify-content: center; margin: 0; }
+.footer-note .logo-mark { background: var(--color-accent); }
+
+.footer-links { display: flex; gap: var(--space-md); }
+.footer-links a { color: var(--color-paper-dim); }
+.footer-links a:hover { color: var(--color-accent); }
+
+.footer-copyright { font-size: 0.8rem; color: var(--color-ink-soft); margin: 0; }
+
+.back-to-top {
+  position: fixed;
+  bottom: var(--space-md);
+  right: var(--space-md);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  z-index: 400;
+}
+.back-to-top:hover { background: var(--color-accent); transform: translateY(-2px); }
+.back-to-top[hidden] { display: none; }
+
+/* ============================================================
+   13. MEDIA QUERIES (mobile-first)
+   Base rules above = mobile (320px+). Each breakpoint below
+   layers on changes for larger viewports.
+   ============================================================ */
+
+/* ---- Small tablets / large phones (≥ 480px) ---- */
+@media (min-width: 480px) {
+  .hero-actions { gap: var(--space-md); }
+}
+
+/* ---- Tablets (≥ 640px) ---- */
+@media (min-width: 640px) {
+  :root {
+    --fs-h1: 2.75rem;
+    --fs-h2: 2rem;
+  }
+
+  .work-grid { grid-template-columns: repeat(2, 1fr); }
+  .services-grid { grid-template-columns: repeat(2, 1fr); }
+  .about-grid { grid-template-columns: 240px 1fr; align-items: start; }
+}
+
+/* ---- Desktop nav breakpoint (≥ 768px) ----
+   Hamburger disappears, full horizontal nav appears. */
+@media (min-width: 768px) {
+  .nav-toggle { display: none; }
+
+  .primary-nav {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    border-bottom: none;
+    background: transparent;
+  }
+
+  .primary-nav ul {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-md);
+    padding: 0;
+  }
+
+  .nav-link {
+    padding: 0.4rem 0;
+    border-bottom: none;
+    position: relative;
+  }
+  /* Animated underline on hover instead of full background change */
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
+    background: var(--color-accent);
+    transition: width var(--transition-base);
+  }
+  .nav-link:hover::after { width: 100%; }
+  .nav-link--cta {
+    border: 1.5px solid var(--color-accent);
+    border-radius: var(--radius);
+    padding: 0.4rem 0.9rem;
+  }
+  .nav-link--cta::after { display: none; }
+
+  .hero-grid { grid-template-columns: 1.4fr 1fr; align-items: center; }
+  .contact-grid { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+
+/* ---- Desktop (≥ 1024px) — margin index appears ---- */
+@media (min-width: 1024px) {
+  :root {
+    --fs-h1: 3.4rem;
+    --fs-h2: 2.25rem;
+  }
+
+  /* Shift main content right to make room for the fixed margin index */
+  body { padding-left: var(--margin-index-width); }
+  .site-header .header-inner,
+  .section-inner,
+  .footer-inner { max-width: calc(var(--content-max)); }
+
+  .margin-index {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--margin-index-width);
+    padding-top: 6rem;
+    border-right: 1px solid var(--color-rule);
+    background: var(--color-paper-dim);
+    z-index: 300;
+  }
+
+  .margin-index a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: var(--space-sm) var(--space-xs);
+    color: var(--color-ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-align: center;
+    border-left: 2px solid transparent;
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+  }
+  .margin-index a:hover {
+    color: var(--color-accent);
+    border-left-color: var(--color-accent);
+    text-decoration: none;
+  }
+  .margin-index a span {
+    font-size: 0.95rem;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+  /* Active section gets a persistent highlight — toggled by script.js */
+  .margin-index a.is-active {
+    color: var(--color-ink);
+    border-left-color: var(--color-ink);
+    background: var(--color-paper);
+  }
+
+  .work-grid { grid-template-columns: repeat(3, 1fr); }
+  .services-grid { grid-template-columns: repeat(4, 1fr); }
+  .skills-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---- Large desktop (≥ 1440px) — cap line lengths, breathe more ---- */
+@media (min-width: 1440px) {
+  :root {
+    --space-xl: 6.5rem;
+  }
+}
+
+/* ---- Print: simplify for paper output ---- */
+@media print {
+  .site-header, .margin-index, .back-to-top, .nav-toggle { display: none; }
+  body { padding-left: 0; }
+  .section { border-bottom: none; padding: 1.5rem 0; }
+}
